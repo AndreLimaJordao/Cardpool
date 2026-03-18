@@ -239,6 +239,14 @@ namespace Cardpool
             if (matchedTime > 0)
             {
                 int stretches = RunSessionTimer(matchedTime * 60, sessionCards);
+                if (stretches == -1)
+                {
+                    pile.InsertRange(0, sessionCards);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n\n  Session stopped early. Cards returned to the top of the pile.");
+                    Console.ResetColor();
+                    return;
+                }
                 LogSession(matchedTime, stretches, sessionCards);
             }
 
@@ -254,9 +262,11 @@ namespace Cardpool
         static int RunSessionTimer(int totalSeconds, List<Card> cards)
         {
             int stretchCount = 0;
+            string[] clockFaces = { "||", "//", "==", "\\\\"};
 
             // Calculate breakpoints based on cumulative minutes of cards
             List<double> checkpoints = new List<double>();
+            List<int> checkpointSeconds = new List<int>();
             if (cards != null && cards.Count > 0 && totalSeconds > 0)
             {
                 int cumulativeMinutes = 0;
@@ -266,6 +276,7 @@ namespace Cardpool
                     cumulativeMinutes += cards[i].TimeNeeded;
                     double fraction = (double)(cumulativeMinutes * 60) / totalSeconds;
                     checkpoints.Add(fraction);
+                    checkpointSeconds.Add(cumulativeMinutes * 60);
                 }
             }
 
@@ -277,6 +288,12 @@ namespace Cardpool
                 {
                     int barLength = 40;
                     int elapsed = totalSeconds - i;
+
+                    if (stretchCount == 0 && checkpointSeconds.Contains(elapsed) && elapsed > 0)
+                    {
+                        Console.Beep(500, 200); // Checkpoint beep
+                    }
+
                     double progress = totalSeconds > 0 ? (double)elapsed / totalSeconds : 1;
                     int filled = (int)(progress * barLength);
 
@@ -302,12 +319,24 @@ namespace Cardpool
 
                     string bar = new string(barChars);
                     TimeSpan time = TimeSpan.FromSeconds(i);
+                    string currentClock = clockFaces[elapsed % 4];
 
-                    Console.Write($"\r  [{bar}] 🏁 {time:hh\\:mm\\:ss} left   ");
+                    Console.Write($"\r  {currentClock} [{bar}] 🏁 {time:hh\\:mm\\:ss} left  (ESC to stop)   ");
 
                     if (i > 0)
                     {
-                        System.Threading.Thread.Sleep(1000);
+                        DateTime waitUntil = DateTime.Now.AddSeconds(1);
+                        while (DateTime.Now < waitUntil)
+                        {
+                            if (Console.KeyAvailable)
+                            {
+                                if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+                                {
+                                    try { Console.CursorVisible = true; } catch { }
+                                    return -1;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -469,6 +498,7 @@ namespace Cardpool
             Console.ResetColor();
             Console.WriteLine("  1. Start Session: Filter by tags and enter available time. The timer progress bar");
             Console.WriteLine("                    shows checkpoints ('╬') marking the transitions between exercises.");
+            Console.WriteLine("                    Press ESC during a session to stop early and return cards.");
             Console.WriteLine("  2. Add Card: Create an exercise and assign tags. Added multiple times based on priority.");
             Console.WriteLine("  3. List Cards: View a table of all unique cards currently in your pool.");
             Console.WriteLine("  4. Modify/Delete: Edit a card's details (including tags) or remove it completely.");
