@@ -30,7 +30,7 @@ Você não avalia se decorou uma carta. Você diz ao programa: *"Eu tenho 15 min
 
 O projeto foi construído em **C# (.NET)**. Para rodá-lo, você precisará ter o SDK do .NET instalado na sua máquina.
 
-1. **Pré-requisito:** Instale o [.NET SDK](https://dotnet.microsoft.com/download) (versão 6.0 ou superior recomendada).
+1. **Pré-requisito:** Instale o [.NET SDK](https://dotnet.microsoft.com/download) (versão 10.0 ou superior recomendada).
 2. **Clone o repositório:**
    ```bash
    git clone [https://github.com/AndreLimaJordao/Cardpool.git](https://github.com/AndreLimaJordao/Cardpool.git)
