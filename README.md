@@ -33,7 +33,7 @@ O projeto foi construído em **C# (.NET)**. Para rodá-lo, você precisará ter 
 1. **Pré-requisito:** Instale o [.NET SDK](https://dotnet.microsoft.com/download) (versão 6.0 ou superior recomendada).
 2. **Clone o repositório:**
    ```bash
-   git clone [https://github.com/SEU_USUARIO/Cardpool.git](https://github.com/SEU_USUARIO/Cardpool.git)
+   git clone [https://github.com/AndreLimaJordao/Cardpool.git](https://github.com/AndreLimaJordao/Cardpool.git)
    cd Cardpool
    ```
 3. Execute o aplicativo:
